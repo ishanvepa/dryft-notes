@@ -1,57 +1,74 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import NoteGraph from '@/components/NoteGraph';
+import React, { useState } from 'react';
+import { Text } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
+  const [notes, setNotes] = useState([
+    { id: '1', label: 'First', content: 'First note', cluster: 'A' },
+    { id: '2', label: 'Second', content: 'Second note', cluster: 'A' },
+    { id: '3', label: 'Third', content: 'Third note', cluster: 'B' },
+    { id: '4', label: 'Fourth', content: 'Fourth note', cluster: 'B' },
+    { id: '5', label: 'Fifth', content: 'Fifth note', cluster: 'C' },
+    { id: '6', label: 'Sixth', content: 'Sixth note', cluster: 'C' },
+    { id: '7', label: 'Seventh', content: 'Seventh note', cluster: 'C' },
+    { id: '8', label: 'Eighth', content: 'Eighth note', cluster: 'D' },
+
+  ]);
+
+  const [links, setLinks] = useState(() => {
+    const clusterMap = {};
+    notes.forEach(note => {
+      if (!clusterMap[note.cluster]) clusterMap[note.cluster] = [];
+      clusterMap[note.cluster].push(note.id);
+    });
+
+    const generatedLinks: { source: string; target: string }[] = [];
+    Object.values(clusterMap).forEach(ids => {
+      for (let i = 0; i < ids.length - 1; i++) {
+        generatedLinks.push({ source: ids[i], target: ids[i + 1] });
+      }
+    });
+    return generatedLinks;
+  });
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
+      <Pressable
+        onPress={() => {
+          const newId = (notes.length + 1).toString();
+          const newNote = {
+            id: newId,
+            label: `Note ${newId}`,
+            content: `Content for note ${newId}`,
+            cluster: String.fromCharCode(65 + (notes.length % 4)), // Cycles A-D
+          };
+          setNotes([...notes, newNote]);
+          setLinks(prevLinks => {
+            // Optionally add a link to the previous note in the same cluster
+            const sameClusterNotes = [...notes, newNote].filter(n => n.cluster === newNote.cluster);
+            if (sameClusterNotes.length > 1) {
+              return [
+                ...prevLinks,
+                { source: sameClusterNotes[sameClusterNotes.length - 2].id, target: newId },
+              ];
+            }
+            return prevLinks;
+          });
+        }}
+        color="#fff"
+        accessibilityLabel="Add a new note"
+      >
+        <Text>>Add Note</Text>
+      </Pressable>
+
+      <NoteGraph
+        notes={notes}
+        relationships={links}
+        onUpdateNote={(newNotes) => setNotes(newNotes)}
+      />
+    </SafeAreaView>
   );
 }
 
@@ -71,5 +88,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#111827',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    color: 'white',
+    fontSize: 22,
+    marginBottom: 10,
   },
 });
