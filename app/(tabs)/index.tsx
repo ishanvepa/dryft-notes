@@ -1,7 +1,6 @@
 import NoteGraph from '@/components/NoteGraph';
 import React, { useState } from 'react';
-import { Text } from 'react-native';
-import { Pressable, SafeAreaView, StyleSheet } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text } from 'react-native';
 
 
 export default function HomeScreen() {
@@ -57,10 +56,10 @@ export default function HomeScreen() {
             return prevLinks;
           });
         }}
-        color="#fff"
         accessibilityLabel="Add a new note"
+        style={styles.notebutton}
       >
-        <Text>>Add Note</Text>
+        <Text>Add Note</Text>
       </Pressable>
 
       <NoteGraph
@@ -100,4 +99,10 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginBottom: 10,
   },
+  notebutton: {
+    backgroundColor: '#3b82f6',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+  }
 });
