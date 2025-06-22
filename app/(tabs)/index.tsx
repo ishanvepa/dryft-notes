@@ -1,4 +1,5 @@
 import NoteGraph from '@/components/NoteGraph';
+// import { useTestAuth } from '@/hooks/useTestAuth';
 import React, { useState } from 'react';
 import { Pressable, SafeAreaView, StyleSheet, Text } from 'react-native';
 
@@ -31,6 +32,8 @@ export default function HomeScreen() {
     });
     return generatedLinks;
   });
+
+  // useTestAuth();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
