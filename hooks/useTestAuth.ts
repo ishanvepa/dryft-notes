@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useEffect } from 'react';
 
 // A .env.local with database login info is required to call this component
 
 export function useTestAuth() {
   useEffect(() => {
     const handleAuth = async () => {
-      const email = 'rohanthapliyal2020@gmail.com';
+      const email = 'ishanvepa171@gmail.com';
       const password = 'password123';
 
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -34,8 +34,8 @@ export function useTestAuth() {
       if (user) {
         const { error: profileError } = await supabase.from('profiles').insert({
           id: user.id,
-          user_name: 'rthap',
-          full_name: 'Rohan Thapliyal',
+          user_name: 'ishanvepa171',
+          full_name: 'Ishan Vepa',
         });
 
         if (profileError) {
