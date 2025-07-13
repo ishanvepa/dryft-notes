@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { Redo2, Undo2 } from 'lucide-react-native';
 import React, { useEffect, useRef } from "react";
 import {
   Animated,
@@ -16,7 +17,13 @@ import {
 } from "react-native";
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 
-const handleHead = ({ tintColor }) => <Text style={{ color: tintColor }}>H1</Text>;
+const handleHead1 = ({ tintColor }) => <Text style={{ color: tintColor }}>H1</Text>;
+const handleHead2 = ({ tintColor }) => <Text style={{ color: tintColor }}>H2</Text>;
+const handleHead3 = ({ tintColor }) => <Text style={{ color: tintColor }}>H3</Text>;
+
+const handleUndo = ({ tintColor }) => <Undo2 size={20} color="white" />;
+const handleRedo = ({ tintColor }) => <Redo2 size={20} color="white" />;
+
 
 const TempScreen = () => {
   const richText = useRef();
@@ -60,7 +67,7 @@ const TempScreen = () => {
   const handleSave = () => {
 
     console.log("Note saved.");
-    router.push("/(tabs)/index"); // or another route
+    router.push("/(tabs)/landing"); // or another route
   };
 
   return (
@@ -95,12 +102,49 @@ const TempScreen = () => {
             <RichToolbar
               editor={richText}
               actions={[
+                actions.undo,
+                actions.redo,
                 actions.setBold,
                 actions.setItalic,
                 actions.setUnderline,
                 actions.heading1,
+                actions.heading2,
+                actions.heading3,
+                actions.setStrikethrough,
+                actions.insertLink,
+                actions.insertBulletsList,
+                actions.insertOrderedList,
+                actions.alignLeft,
+                actions.alignCenter,
+                actions.alignRight,
+                
+                actions.removeFormat,
               ]}
-              iconMap={{ [actions.heading1]: handleHead }}
+              iconMap={{
+                 [actions.heading1]: handleHead1,
+                 [actions.heading2]: handleHead2,
+                 [actions.heading3]: handleHead3,                 
+                 [actions.undo]: handleUndo,                 
+                 [actions.redo]: handleRedo
+
+
+              }}
+              style={{
+                backgroundColor: '#222', // e.g., Tailwind's gray-800
+                borderTopWidth: 1,
+                borderColor: '#333',     // Tailwind gray-700
+                paddingVertical: 6,
+              }}
+              iconTint="#fff"            // unselected icon color (Tailwind gray-300)
+              selectedIconTint="#2e7d32"    // selected icon color (Tailwind cyan-400)
+              selectedButtonStyle={{
+                backgroundColor: '#111', // Tailwind gray-900
+                borderRadius: 8,
+                padding: 6,
+              }}
+              unselectedButtonStyle={{
+                padding: 6,
+              }}
             />
           </Animated.View>)}
         </View>
@@ -134,7 +178,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    // ✅ Elevation for Android
+    // Elevation for Android
     elevation: 5,    
     borderColor: "#ccc",
     opacity: 1
