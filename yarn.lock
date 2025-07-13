@@ -1865,6 +1865,11 @@
   dependencies:
     "@radix-ui/react-compose-refs" "1.1.2"
 
+"@react-native-masked-view/masked-view@0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@react-native-masked-view/masked-view/-/masked-view-0.3.2.tgz#7064533a573e3539ec912f59c1f457371bf49dd9"
+  integrity sha512-XwuQoW7/GEgWRMovOQtX3A4PrXhyaZm0lVUiY8qJDvdngjLms9Cpdck6SmGAUNqQwcj2EadHC1HwL0bEyoa/SQ==
+
 "@react-native/assets-registry@0.79.3":
   version "0.79.3"
   resolved "https://registry.npmjs.org/@react-native/assets-registry/-/assets-registry-0.79.3.tgz"
@@ -4293,6 +4298,11 @@ expo-keep-awake@~14.1.4:
   resolved "https://registry.npmjs.org/expo-keep-awake/-/expo-keep-awake-14.1.4.tgz"
   integrity sha512-wU9qOnosy4+U4z/o4h8W9PjPvcFMfZXrlUoKTMBW7F4pLqhkkP/5G4EviPZixv4XWFMjn1ExQ5rV6BX8GwJsWA==
 
+expo-linear-gradient@~14.1.5:
+  version "14.1.5"
+  resolved "https://registry.yarnpkg.com/expo-linear-gradient/-/expo-linear-gradient-14.1.5.tgz#414bf0c8145089087198d4dd5a419eb324af2a02"
+  integrity sha512-BSN3MkSGLZoHMduEnAgfhoj3xqcDWaoICgIr4cIYEx1GcHfKMhzA/O4mpZJ/WC27BP1rnAqoKfbclk1eA70ndQ==
+
 expo-linking@~7.1.5:
   version "7.1.5"
   resolved "https://registry.npmjs.org/expo-linking/-/expo-linking-7.1.5.tgz"
@@ -6536,6 +6546,11 @@ react-native-network-graph@^1.0.1:
   dependencies:
     prop-types "^15.5.10"
     react-native-svg "^5.1.8"
+
+react-native-pell-rich-editor@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/react-native-pell-rich-editor/-/react-native-pell-rich-editor-1.9.0.tgz#e222b4cd8ead9b5e1de7b6cf2f31a3315c82e570"
+  integrity sha512-BKzlu++FySzPXrb5bczD8b/ZZJtfzcD4z7FvW7TrH+4OENEQtaIiEMfmb5N09Kv3YVJcfm8fut8Y+GLNAcCQHA==
 
 react-native-reanimated@~3.17.4:
   version "3.17.5"

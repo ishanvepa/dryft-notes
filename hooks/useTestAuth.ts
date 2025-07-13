@@ -46,6 +46,6 @@ export function useTestAuth() {
       }
     };
 
-    handleAuth();
+    // handleAuth();
   }, []);
 }

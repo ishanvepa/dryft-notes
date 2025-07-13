@@ -1,0 +1,142 @@
+import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef } from "react";
+import {
+  Animated,
+  Easing,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
+
+const handleHead = ({ tintColor }) => <Text style={{ color: tintColor }}>H1</Text>;
+
+const TempScreen = () => {
+  const richText = useRef();
+  const animatedBottom = useRef(new Animated.Value(0)).current;
+  const router = useRouter();
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      Animated.timing(animatedBottom, {
+        toValue: e.endCoordinates.height,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: false,
+      }).start();
+    });
+
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      Animated.timing(animatedBottom, {
+        toValue: 0,
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: false,
+      }).start();
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+    richText.current?.blurContentEditor();
+  };
+
+  const handleSave = () => {
+    
+    console.log("Note saved.");
+    router.push("/index"); // or another route
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={{ flex: 1 }}>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+          >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+              <RichEditor
+                ref={richText}
+                placeholder="Start typing..."
+                style={styles.editor}
+                onChange={(descriptionText) => {
+                  console.log("descriptionText:", descriptionText);
+                }}
+              />
+            </ScrollView>
+          </KeyboardAvoidingView>
+
+          <Animated.View style={[styles.toolbarContainer, { bottom: animatedBottom }]}>
+            <RichToolbar
+              editor={richText}
+              actions={[
+                actions.setBold,
+                actions.setItalic,
+                actions.setUnderline,
+                actions.heading1,
+              ]}
+              iconMap={{ [actions.heading1]: handleHead }}
+            />
+          </Animated.View>
+        </View>
+      </TouchableWithoutFeedback>
+
+      {/* Floating Save Button */}
+      <TouchableOpacity style={styles.fab} onPress={handleSave}>
+        <Feather name="save" size={24} color="#fff" />
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  editor: {
+    minHeight: 200,
+    margin: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  toolbarContainer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    backgroundColor: "#f9f9f9",
+    borderTopWidth: 1,
+    borderColor: "#ccc",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 90,
+    right: 20,
+    backgroundColor: "#2e7d32",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+});
+
+export default TempScreen;
