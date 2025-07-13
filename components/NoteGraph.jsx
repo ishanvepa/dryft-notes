@@ -108,7 +108,7 @@ const initialScale = useSharedValue(1);
               <Line key={i} x1={l.source.x} y1={l.source.y} x2={l.target.x} y2={l.target.y} stroke="#aaa" strokeWidth="3" />
             ))}
             {nodes.map((n, i) => (
-              <Circle key={i} cx={n.x} cy={n.y} r={20} fill="#4682b4" onPress={() => handleNodePress(n)} />
+              <Circle key={i} cx={n.x} cy={n.y} r={20} fill="#2e7d32" onPress={() => handleNodePress(n)} />
             ))}
             {nodes.map((n, i) => (
               <SvgText key={`label-${i}`} x={n.x} y={n.y + 35} fontSize="12" textAnchor="middle" fill="#fff">

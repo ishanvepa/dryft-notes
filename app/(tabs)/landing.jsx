@@ -26,10 +26,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#fff',
+    backgroundColor: '#111',
   },
   title: {
     fontSize: 22,
+    color: "#fff",
     fontWeight: 'bold',
     marginBottom: 32,
     textAlign: 'center',

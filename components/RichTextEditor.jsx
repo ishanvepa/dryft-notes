@@ -77,10 +77,15 @@ const TempScreen = () => {
             >
               <RichEditor
                 ref={richText}
-                placeholder="Start typing..."
+                placeholder="Start dryfting..."
                 style={styles.editor}
                 onChange={(descriptionText) => {
                   console.log("descriptionText:", descriptionText);
+                }}
+                editorStyle={{
+                  backgroundColor: "#111",       // Editor background
+                  color: "#fff",                 // Main text color
+                  placeholderColor: "#888",      // Placeholder color
                 }}
               />
             </ScrollView>
@@ -114,10 +119,10 @@ const styles = StyleSheet.create({
   },
   editor: {
     minHeight: 400,
-    margin: 5,
-    borderWidth: 1,
+    marginHorizontal: 5,
+    // borderWidth: 1,
     // borderColor: "#ccc",
-    backgroundColor: "#000000"
+    backgroundColor: "#111"
   },
   toolbarContainer: {
     position: "absolute",

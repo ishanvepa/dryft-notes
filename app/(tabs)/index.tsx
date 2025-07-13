@@ -1,7 +1,8 @@
 import NoteGraph from '@/components/NoteGraph';
 import { useTestAuth } from '@/hooks/useTestAuth';
+import { Feather } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Pressable, SafeAreaView, StyleSheet, Text } from 'react-native';
+import { SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native';
 
 
 export default function HomeScreen() {
@@ -37,7 +38,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
-      <Pressable
+      {/* <Pressable
         onPress={() => {
           const newId = (notes.length + 1).toString();
           const newNote = {
@@ -63,13 +64,39 @@ export default function HomeScreen() {
         style={styles.notebutton}
       >
         <Text>Add Note</Text>
-      </Pressable>
+      </Pressable> */}
 
       <NoteGraph
         notes={notes}
         relationships={links}
         onUpdateNote={(newNotes) => setNotes(newNotes)}
       />
+      <TouchableOpacity style={styles.fab} 
+        onPress={() => {
+          const newId = (notes.length + 1).toString();
+          const newNote = {
+            id: newId,
+            label: `Note ${newId}`,
+            content: `Content for note ${newId}`,
+            cluster: String.fromCharCode(65 + (notes.length % 4)), // Cycles A-D
+          };
+          setNotes([...notes, newNote]);
+          setLinks(prevLinks => {
+            // Optionally add a link to the previous note in the same cluster
+            const sameClusterNotes = [...notes, newNote].filter(n => n.cluster === newNote.cluster);
+            if (sameClusterNotes.length > 1) {
+              return [
+                ...prevLinks,
+                { source: sameClusterNotes[sameClusterNotes.length - 2].id, target: newId },
+              ];
+            }
+            return prevLinks;
+          });
+        }}
+      >
+        <Feather name="plus" size={24} color="#fff" />
+      </TouchableOpacity>
+
     </SafeAreaView>
   );
 }
@@ -93,7 +120,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#111827',
+    backgroundColor: '#111',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -103,9 +130,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   notebutton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#2e7d32',
     padding: 10,
     borderRadius: 5,
     marginBottom: 20,
-  }
+  },
+  fab: {
+    position: "absolute",
+    bottom: 90,
+    right: 20,
+    backgroundColor: "#2e7d32",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
 });
