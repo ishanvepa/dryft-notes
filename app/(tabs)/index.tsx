@@ -1,11 +1,14 @@
 import NoteGraph from '@/components/NoteGraph';
 import { useTestAuth } from '@/hooks/useTestAuth';
 import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native';
 
 
 export default function HomeScreen() {
+  const router = useRouter();
+
   const [notes, setNotes] = useState([
     { id: '1', label: 'First', content: 'First note', cluster: 'A' },
     { id: '2', label: 'Second', content: 'Second note', cluster: 'A' },
@@ -72,27 +75,29 @@ export default function HomeScreen() {
         onUpdateNote={(newNotes) => setNotes(newNotes)}
       />
       <TouchableOpacity style={styles.fab} 
-        onPress={() => {
-          const newId = (notes.length + 1).toString();
-          const newNote = {
-            id: newId,
-            label: `Note ${newId}`,
-            content: `Content for note ${newId}`,
-            cluster: String.fromCharCode(65 + (notes.length % 4)), // Cycles A-D
-          };
-          setNotes([...notes, newNote]);
-          setLinks(prevLinks => {
-            // Optionally add a link to the previous note in the same cluster
-            const sameClusterNotes = [...notes, newNote].filter(n => n.cluster === newNote.cluster);
-            if (sameClusterNotes.length > 1) {
-              return [
-                ...prevLinks,
-                { source: sameClusterNotes[sameClusterNotes.length - 2].id, target: newId },
-              ];
-            }
-            return prevLinks;
-          });
-        }}
+        onPress={ () => router.push("/new_note")
+        //   () => {
+        //   const newId = (notes.length + 1).toString();
+        //   const newNote = {
+        //     id: newId,
+        //     label: `Note ${newId}`,
+        //     content: `Content for note ${newId}`,
+        //     cluster: String.fromCharCode(65 + (notes.length % 4)), // Cycles A-D
+        //   };
+        //   setNotes([...notes, newNote]);
+        //   setLinks(prevLinks => {
+        //     // Optionally add a link to the previous note in the same cluster
+        //     const sameClusterNotes = [...notes, newNote].filter(n => n.cluster === newNote.cluster);
+        //     if (sameClusterNotes.length > 1) {
+        //       return [
+        //         ...prevLinks,
+        //         { source: sameClusterNotes[sameClusterNotes.length - 2].id, target: newId },
+        //       ];
+        //     }
+        //     return prevLinks;
+        //   });
+        // }
+      }
       >
         <Feather name="plus" size={24} color="#fff" />
       </TouchableOpacity>
