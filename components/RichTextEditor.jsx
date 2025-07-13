@@ -12,8 +12,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+  View
 } from "react-native";
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 
@@ -23,9 +22,11 @@ const TempScreen = () => {
   const richText = useRef();
   const animatedBottom = useRef(new Animated.Value(0)).current;
   const router = useRouter();
+  const [keyboardVisible, setKeyboardVisible] = React.useState(false);
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      setKeyboardVisible(true);
       Animated.timing(animatedBottom, {
         toValue: e.endCoordinates.height,
         duration: 300,
@@ -40,7 +41,9 @@ const TempScreen = () => {
         duration: 250,
         easing: Easing.out(Easing.ease),
         useNativeDriver: false,
-      }).start();
+      }).start(() => {
+        setKeyboardVisible(false);
+      });
     });
 
     return () => {
@@ -55,20 +58,23 @@ const TempScreen = () => {
   };
 
   const handleSave = () => {
-    
+
     console.log("Note saved.");
-    router.push("/index"); // or another route
+    router.push("/(tabs)/index"); // or another route
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={{ flex: 1 }}>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : undefined}
           >
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <ScrollView
+              contentContainerStyle={{ paddingBottom: 300 }}
+              keyboardShouldPersistTaps="handled"
+              onScrollBeginDrag={dismissKeyboard}
+            >
               <RichEditor
                 ref={richText}
                 placeholder="Start typing..."
@@ -80,7 +86,7 @@ const TempScreen = () => {
             </ScrollView>
           </KeyboardAvoidingView>
 
-          <Animated.View style={[styles.toolbarContainer, { bottom: animatedBottom }]}>
+          {keyboardVisible && (<Animated.View style={[styles.toolbarContainer, { bottom: Animated.subtract(animatedBottom, 27) }]}>
             <RichToolbar
               editor={richText}
               actions={[
@@ -91,9 +97,8 @@ const TempScreen = () => {
               ]}
               iconMap={{ [actions.heading1]: handleHead }}
             />
-          </Animated.View>
+          </Animated.View>)}
         </View>
-      </TouchableWithoutFeedback>
 
       {/* Floating Save Button */}
       <TouchableOpacity style={styles.fab} onPress={handleSave}>
@@ -108,18 +113,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   editor: {
-    minHeight: 200,
+    minHeight: 400,
     margin: 5,
     borderWidth: 1,
-    borderColor: "#ccc",
+    // borderColor: "#ccc",
+    backgroundColor: "#000000"
   },
   toolbarContainer: {
     position: "absolute",
     left: 0,
     right: 0,
     backgroundColor: "#f9f9f9",
-    borderTopWidth: 1,
+    // borderTopWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    // ✅ Elevation for Android
+    elevation: 5,    
     borderColor: "#ccc",
+    opacity: 1
   },
   fab: {
     position: "absolute",

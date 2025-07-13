@@ -7,10 +7,10 @@ export default function Landing() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>have to jot a note? start dryfting</Text>
+      <Text style={styles.title}>have to jot a note? {"\n"} start dryfting</Text>
       <View style={styles.buttonContainer}>
         <View style={styles.button}>
-          <Button title="Create Note" color="#fff" onPress={() => router.push('/create_note')} />
+          <Button title="Create Note" color="#fff" onPress={() => router.push('/new_note')} />
         </View>
         <View style={styles.button}>
           <Button title="View Notes" color="#fff" onPress={() => router.push('/(tabs)/profile')} />
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     overflow: 'hidden',
     elevation: 2,
-    backgroundColor: '#D78800',
+    backgroundColor: '#2e7d32',
     padding: 5
     
   },
