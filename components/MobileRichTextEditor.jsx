@@ -25,7 +25,7 @@ const handleUndo = ({ tintColor }) => <Undo2 size={20} color="white" />;
 const handleRedo = ({ tintColor }) => <Redo2 size={20} color="white" />;
 
 
-const TempScreen = () => {
+const MobileRichTextEditor = () => {
   const richText = useRef();
   const animatedBottom = useRef(new Animated.Value(0)).current;
   const router = useRouter();
@@ -201,4 +201,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TempScreen;
+export default MobileRichTextEditor;

@@ -1,6 +1,6 @@
-import RichTextEditor from '@/components/RichTextEditor';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+
 
 const inputAccessoryViewID = "newNote";
 const EXAMPLE_CONTENT = [
@@ -19,11 +19,16 @@ const EXAMPLE_CONTENT = [
 // const navigation = useNavigation();
 
 export default function NewNote() {
+  let Editor;
+  if (Platform.OS === 'web') {
+    Editor = require('@/components/WebRichTextEditor').default;
+  } else {
+    Editor = require('@/components/MobileRichTextEditor').default;
+  }
 
   return (
     <View style={styles.container}>
-      <RichTextEditor />
-      {/* <Button title="Save Note" onPress={handleSave} /> */}
+      <Editor />
     </View>
   );
 }
