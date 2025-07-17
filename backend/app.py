@@ -17,6 +17,14 @@ def r_new_note():
 def r_delete_note():
     return jsonify({"message": "Note deleted"})
 
+@app.route('/edit-note', methods=['POST'])
+def r_edit_note():
+    return jsonify({"message": "Note edited"})
+
+@app.route('/get-notes', methods=['GET'])
+def r_get_notes():
+    return jsonify({"message": "Notes retrieved"})
+
 
 
 
