@@ -1,12 +1,216 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
+import LexicalTheme from './LexicalTheme';
 
-export default function WebRichTextEditor() {
+import React, { useEffect, useState } from 'react';
+
+function Toolbar() {
+  const [editor] = useLexicalComposerContext();
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+
+  useEffect(() => {
+    return editor.registerUpdateListener(({editorState}) => {
+      editorState.read(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          setIsBold(selection.hasFormat('bold'));
+          setIsItalic(selection.hasFormat('italic'));
+          setIsUnderline(selection.hasFormat('underline'));
+        }
+        // Log the editor state as JSON
+        const json = editorState.toJSON();
+        console.log('Editor state updated:', json);
+      });
+    });
+  }, [editor]);
+
+  // Track undo/redo stack using editor history state
+  useEffect(() => {
+    // Listen for editor updates to update undo/redo availability
+    return editor.registerUpdateListener(() => {
+      const historyState = (editor as any)._historyState;
+      if (historyState) {
+        setCanUndo(historyState.canUndo());
+        setCanRedo(historyState.canRedo());
+      } else {
+        setCanUndo(false);
+        setCanRedo(false);
+      }
+    });
+  }, [editor]);
+
   return (
-    <View>
-      <Text>WebRichTextEditor</Text>
-    </View>
-  )
+    <div style={{
+      display: 'flex',
+      gap: 8,
+      marginBottom: 12,
+      background: '#222',
+      padding: '8px 12px',
+      borderRadius: 6,
+      alignItems: 'center'
+    }}>
+      <button
+        type="button"
+        aria-label="Bold"
+        style={{
+          fontWeight: isBold ? 'bold' : 'normal',
+          background: isBold ? '#444' : 'transparent',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          padding: '4px 8px',
+          cursor: 'pointer'
+        }}
+        onMouseDown={e => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
+        }}
+      >
+        B
+      </button>
+      <button
+        type="button"
+        aria-label="Italic"
+        style={{
+          fontStyle: isItalic ? 'italic' : 'normal',
+          background: isItalic ? '#444' : 'transparent',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          padding: '4px 8px',
+          cursor: 'pointer'
+        }}
+        onMouseDown={e => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
+        }}
+      >
+        I
+      </button>
+      <button
+        type="button"
+        aria-label="Underline"
+        style={{
+          textDecoration: isUnderline ? 'underline' : 'none',
+          background: isUnderline ? '#444' : 'transparent',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          padding: '4px 8px',
+          cursor: 'pointer'
+        }}
+        onMouseDown={e => {
+          e.preventDefault();
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
+        }}
+      >
+        U
+      </button>
+      <button
+        type="button"
+        aria-label="Undo"
+        style={{
+          background: canUndo ? '#444' : 'transparent',
+          color: canUndo ? 'white' : '#888',
+          border: 'none',
+          borderRadius: 4,
+          padding: '4px 8px',
+          cursor: canUndo ? 'pointer' : 'not-allowed'
+        }}
+        disabled={!canUndo}
+        onMouseDown={e => {
+          e.preventDefault();
+          editor.dispatchCommand(UNDO_COMMAND, undefined);
+        }}
+      >
+        Undo
+      </button>
+      <button
+        type="button"
+        aria-label="Redo"
+        style={{
+          background: canRedo ? '#444' : 'transparent',
+          color: canRedo ? 'white' : '#888',
+          border: 'none',
+          borderRadius: 4,
+          padding: '4px 8px',
+          cursor: canRedo ? 'pointer' : 'not-allowed'
+        }}
+        disabled={!canRedo}
+        onMouseDown={e => {
+          e.preventDefault();
+          editor.dispatchCommand(REDO_COMMAND, undefined);
+        }}
+      >
+        Redo
+      </button>
+    </div>
+  );
 }
 
-const styles = StyleSheet.create({})
+export default function WebRichTextEditor() {
+  const initialConfig = {
+    namespace: 'WebEditor',
+    theme: LexicalTheme,
+    onError(error: Error) {
+      throw error;
+    },
+  };
+
+  const styles = {
+    container: {
+      flex: 1,
+      padding: 16,
+      backgroundColor: '#111',
+      color: 'white',
+      fontFamily: 'sans-serif',
+      position: 'relative' as 'relative',
+    },
+    editorInput: {
+      minHeight: 300,
+      outline: 'none',
+      color: 'white',
+      fontSize: 16,
+      lineHeight: 1.5,
+    },
+    placeholder: {
+      color: '#888',
+      position: 'absolute' as 'absolute',
+      top: 16,
+      left: 16,
+      pointerEvents: 'none' as const,
+      fontSize: 16,
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <LexicalComposer initialConfig={initialConfig}>
+        <Toolbar />
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable
+              aria-placeholder={'Enter some text...'}
+              placeholder={<div style={styles.placeholder}>Enter some text...</div>}
+              style={styles.editorInput}
+            />
+          }
+          placeholder={<div style={styles.placeholder}>Enter some text...</div>}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <HistoryPlugin />
+        <AutoFocusPlugin />
+      </LexicalComposer>
+    </div>
+  );
+}
