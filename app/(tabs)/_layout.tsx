@@ -39,6 +39,27 @@ export default function TabLayout() {
         // Glassmorphism: backdrop blur (iOS only)
         // backdropFilter: 'blur(20px)',
         },
+        web: {
+          maxWidth: 500,
+          position: 'absolute',
+          top: 'auto',
+          left: '50%',
+          marginLeft: -250, // half of maxWidth to center
+          bottom: 25,
+          // paddingTop: 12,
+          // elevation: 5,
+          borderRadius: 50,
+          backgroundColor: 'rgba(55, 55, 55, 0.3)',
+          // borderWidth: 1,
+          // borderColor: 'rgba(255,255,255,0.3)',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.15,
+          shadowRadius: 16,
+          overflow: 'hidden',
+          // Glassmorphism: backdrop blur (iOS only)
+          // backdropFilter: 'blur(20px)',
+        }, 
         android: {
         position: 'absolute',
         top: 'auto',
