@@ -10,6 +10,8 @@ import LexicalTheme from './LexicalTheme';
 
 import './LexicalTheme.css';
 
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 
 function Toolbar() {
@@ -161,6 +163,19 @@ function Toolbar() {
 }
 
 export default function WebRichTextEditor() {
+  const router = useRouter();
+
+  const handleSave = () => {
+    console.log('Note saved.');
+    try {
+      router.push('/(tabs)/landing');
+    } catch (e) {
+  // Fallback for environments without expo-router
+  console.warn('router.push failed, falling back to window.location:', e);
+  if (typeof window !== 'undefined') window.location.href = '/(tabs)/landing';
+    }
+  };
+
   const initialConfig = {
     namespace: 'WebEditor',
     theme: LexicalTheme,
@@ -169,14 +184,14 @@ export default function WebRichTextEditor() {
     },
   };
 
-  const styles = {
+  const styles: { [key: string]: React.CSSProperties } = {
     container: {
       flex: 1,
       padding: 16,
       backgroundColor: '#111',
       color: 'white',
       fontFamily: 'sans-serif',
-      position: 'relative' as 'relative',
+      position: 'relative',
     },
     editorInput: {
       minHeight: 300,
@@ -187,11 +202,28 @@ export default function WebRichTextEditor() {
     },
     placeholder: {
       color: '#888',
-      position: 'absolute' as 'absolute',
+      position: 'absolute',
       top: 16,
       left: 16,
-      pointerEvents: 'none' as const,
+      pointerEvents: 'none',
       fontSize: 16,
+    },
+    fab: {
+      position: 'fixed',
+      right: 20,
+      bottom: 90,
+      backgroundColor: '#2e7d32',
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#fff',
+      border: 'none',
+      cursor: 'pointer',
+      boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+      fontSize: 20,
     },
   };
 
@@ -213,6 +245,15 @@ export default function WebRichTextEditor() {
         <HistoryPlugin />
         <AutoFocusPlugin />
       </LexicalComposer>
+        <button
+          type="button"
+          aria-label="Save"
+          title="Save"
+          style={styles.fab}
+          onClick={handleSave}
+        >
+          <Feather name="save" size={24} color="#fff" />
+        </button>
     </div>
   );
 }
