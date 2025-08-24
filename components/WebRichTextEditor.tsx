@@ -8,6 +8,8 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
 import LexicalTheme from './LexicalTheme';
 
+import './LexicalTheme.css';
+
 import React, { useEffect, useState } from 'react';
 
 function Toolbar() {
