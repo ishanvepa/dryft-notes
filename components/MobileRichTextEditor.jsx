@@ -16,6 +16,7 @@ import {
   View
 } from "react-native";
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
+import handleSave from './saveNote';
 
 const handleHead1 = ({ tintColor }) => <Text style={{ color: tintColor }}>H1</Text>;
 const handleHead2 = ({ tintColor }) => <Text style={{ color: tintColor }}>H2</Text>;
@@ -64,10 +65,18 @@ const MobileRichTextEditor = () => {
     richText.current?.blurContentEditor();
   };
 
-  const handleSave = () => {
+  const onSave = async () => {
+  let html;
+    try {
+      if (richText.current && typeof richText.current.getContentHtml === 'function') {
+        // getContentHtml may return a promise or string
+        html = await richText.current.getContentHtml();
+      }
+    } catch (e) {
+      console.warn('Failed to read mobile editor content for save:', e);
+    }
 
-    console.log("Note saved.");
-    router.push("/(tabs)/landing"); // or another route
+    handleSave(router, { text: html });
   };
 
   return (
@@ -150,7 +159,7 @@ const MobileRichTextEditor = () => {
         </View>
 
       {/* Floating Save Button */}
-      <TouchableOpacity style={styles.fab} onPress={handleSave}>
+  <TouchableOpacity style={styles.fab} onPress={onSave}>
         <Feather name="save" size={24} color="#fff" />
       </TouchableOpacity>
     </SafeAreaView>

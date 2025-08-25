@@ -13,6 +13,7 @@ import './LexicalTheme.css';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import handleSave from './saveNote';
 
 function Toolbar() {
   const [editor] = useLexicalComposerContext();
@@ -162,19 +163,40 @@ function Toolbar() {
   );
 }
 
+function SaveButton({ router, style }: { router: any; style?: React.CSSProperties }) {
+  const [editor] = useLexicalComposerContext();
+
+  const onClick = async () => {
+    let json: any = null;
+    try {
+      editor.getEditorState().read(() => {
+        json = editor.getEditorState().toJSON();
+      });
+    } catch (e) {
+      // fallback: try to call toJSON on editorState fetched synchronously
+      try {
+        const s = editor.getEditorState();
+        json = s.toJSON();
+      } catch (err) {
+        console.warn('Failed to read editor state for save:', err);
+      }
+    }
+
+  const text: string | undefined = json ? JSON.stringify(json) : undefined;
+  handleSave(router, { text });
+  };
+
+  return (
+    <button type="button" aria-label="Save" title="Save" style={style} onClick={onClick}>
+      <Feather name="save" size={24} color="#fff" />
+    </button>
+  );
+}
+
 export default function WebRichTextEditor() {
   const router = useRouter();
 
-  const handleSave = () => {
-    console.log('Note saved.');
-    try {
-      router.push('/(tabs)/landing');
-    } catch (e) {
-  // Fallback for environments without expo-router
-  console.warn('router.push failed, falling back to window.location:', e);
-  if (typeof window !== 'undefined') window.location.href = '/(tabs)/landing';
-    }
-  };
+  // navigation + save handled by SaveButton which calls shared handleSave
 
   const initialConfig = {
     namespace: 'WebEditor',
@@ -244,16 +266,8 @@ export default function WebRichTextEditor() {
         />
         <HistoryPlugin />
         <AutoFocusPlugin />
+        <SaveButton router={router} style={styles.fab} />
       </LexicalComposer>
-        <button
-          type="button"
-          aria-label="Save"
-          title="Save"
-          style={styles.fab}
-          onClick={handleSave}
-        >
-          <Feather name="save" size={24} color="#fff" />
-        </button>
     </div>
   );
 }
