@@ -1,18 +1,59 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+
+import { supabase } from '@/lib/supabase';
+import { Feather } from '@expo/vector-icons';
 
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Feather } from '@expo/vector-icons';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    async function check() {
+      try {
+        const sessionResp = await supabase.auth.getSession();
+        const session = sessionResp?.data?.session ?? null;
+        if (!session) {
+          // router.replace accepts typed paths; cast to any to avoid TS noise
+          router.replace('/signin' as any);
+        }
+      } catch (e) {
+        console.warn('Auth check failed:', e);
+      } finally {
+        if (mounted) setChecking(false);
+      }
+    }
+
+    check();
+
+    // Listen to auth changes (sign-out) and redirect to signin when no session
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) router.replace('/signin' as any);
+    });
+
+    return () => {
+      mounted = false;
+      try {
+        // unsubscribe if possible
+        listener?.subscription?.unsubscribe?.();
+      } catch (e) {
+        console.warn('Failed to unsubscribe auth listener:', e);
+      }
+    };
+  }, []);
+
+  // If still checking auth, render nothing (or consider a loading screen)
+  if (checking) return null;
 
   return (
-    
-    <Tabs
+  <Tabs
       screenOptions={{
       tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
       headerShown: false,
@@ -86,16 +127,24 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) =>  <Feather name="home" size={24} color="#fff" />,
+          tabBarIcon: HomeIcon,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) =>  <Feather name="user" size={24} color="#fff" />,
+          tabBarIcon: ProfileIcon,
         }}
       />
     </Tabs>
   );
+}
+
+function HomeIcon() {
+  return <Feather name="home" size={24} color="#fff" />;
+}
+
+function ProfileIcon() {
+  return <Feather name="user" size={24} color="#fff" />;
 }
