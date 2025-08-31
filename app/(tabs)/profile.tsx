@@ -1,7 +1,7 @@
 import { signOut } from '@/lib/auth'
 import { useRouter } from 'expo-router'
 import React from 'react'
-import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { ActivityIndicator, Alert, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native'
 
 export default function Profile() {
   const router = useRouter()
@@ -26,19 +26,27 @@ export default function Profile() {
   }
 
   const handleSignOut = () => {
-  console.log('Profile: handleSignOut pressed')
-  Alert.alert(
-      'Sign out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign out',
-          style: 'destructive',
-          onPress: () => void doSignOut(),
-        },
-      ],
-    )
+    console.log('Profile: handleSignOut pressed')
+    if(Platform.OS === 'web'){
+      let isSignOut = confirm('Are you sure you want to sign out?');
+      if(isSignOut){
+        doSignOut();       
+      }
+
+    } else {
+      Alert.alert(
+          'Sign out',
+          'Are you sure you want to sign out?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Sign out',
+              style: 'destructive',
+              onPress: () => void doSignOut(),
+            },
+          ],
+        )
+    }
   }
 
   return (
