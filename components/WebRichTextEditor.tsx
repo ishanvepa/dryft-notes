@@ -219,7 +219,7 @@ function SaveButton({ router, style, onSave }: { router: any; style?: React.CSSP
   );
 }
 
-export default function WebRichTextEditor({ initialText, onSave }: { initialText?: string; onSave?: (text?: string) => void }) {
+export default function WebRichTextEditor({ initialText, onSave, hideFab, requestSaveRef }: { initialText?: string; onSave?: (text?: string) => void; hideFab?: boolean; requestSaveRef?: { current?: () => Promise<string | undefined> } }) {
   const router = useRouter();
 
   // navigation + save handled by SaveButton which calls shared handleSave
@@ -249,10 +249,11 @@ export default function WebRichTextEditor({ initialText, onSave }: { initialText
       lineHeight: 1.5,
     },
     placeholder: {
-      color: '#888',
-      position: 'absolute',
-      top: 16,
-      left: 16,
+  color: '#888',
+  position: 'absolute',
+  // place placeholder under the toolbar
+  top: 72,
+  left: 16,
       pointerEvents: 'none',
       fontSize: 16,
     },
@@ -269,7 +270,8 @@ export default function WebRichTextEditor({ initialText, onSave }: { initialText
       justifyContent: 'center',
       color: '#fff',
       border: 'none',
-      cursor: 'pointer',
+  cursor: 'pointer',
+  zIndex: 10000,
       boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
       fontSize: 20,
     },
@@ -278,6 +280,8 @@ export default function WebRichTextEditor({ initialText, onSave }: { initialText
   return (
     <div style={styles.container}>
       <LexicalComposer initialConfig={initialConfig}>
+  {/* Provide external access to read editor state */}
+  {requestSaveRef ? <InnerRequestSave refObj={requestSaveRef} /> : null}
         <Toolbar />
         <RichTextPlugin
           contentEditable={
@@ -292,8 +296,35 @@ export default function WebRichTextEditor({ initialText, onSave }: { initialText
         />
         <HistoryPlugin />
         <AutoFocusPlugin />
-  <SaveButton router={router} style={styles.fab} onSave={onSave} />
+  {!hideFab && <SaveButton router={router} style={styles.fab} onSave={onSave} />}
       </LexicalComposer>
     </div>
   );
+}
+
+function InnerRequestSave({ refObj }: { refObj: { current?: () => Promise<string | undefined> } }) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (!refObj) return;
+    refObj.current = async () => {
+      let plainText: string | undefined;
+      try {
+        editor.getEditorState().read(() => {
+          const root = $getRoot();
+          plainText = root.getTextContent();
+        });
+      } catch (e) {
+        try {
+          const s = editor.getEditorState();
+          plainText = s.toJSON ? JSON.stringify(s.toJSON()) : undefined;
+        } catch (err) {
+          console.warn('Failed to read editor state for external save:', err);
+        }
+      }
+      return plainText;
+    };
+  }, [editor, refObj]);
+
+  return null;
 }

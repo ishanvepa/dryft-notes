@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react';
-import { Button, Modal, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Button, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 // Lazy-load web editor to avoid bundling Lexical on native
 let WebEditor = null;
@@ -12,41 +13,51 @@ try {
   // ignore - will fallback to text input
 }
 
-export default function NoteEditorModal({ note, onClose, onSave }) {
-  const [text, setText] = useState(note.content || '');
+export default function NoteEditorModal(props) {
+  const { note, onClose, onSave } = props;
+  const [text, setText] = useState(note?.content || '');
   const isMobile = Platform.OS === 'ios' || Platform.OS === 'android';
   if(isMobile){
       return (
-        <Modal animationType="slide" transparent={true} visible={true}>
+        <Modal animationType="fade" transparent={true} visible={true}>
           <View style={styles.overlay}>
             <ScrollView style={styles.modal}>
-              <TextInput
-                style={styles.input}
-                value={text}
-                onChangeText={setText}
-                placeholder="Edit your note"
-                multiline
-              />
-              <Button title="Save" onPress={() => onSave(text)} />
-              <Button title="Cancel" onPress={onClose} color="gray" />
+              <View style={styles.modalContent}>
+                <TouchableOpacity style={styles.closeButton} onPress={onClose} hitSlop={{top:10,left:10,right:10,bottom:10}}>
+                  <Text style={styles.closeText}>✕</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={styles.input}
+                  value={text}
+                  onChangeText={setText}
+                  placeholder="Edit your note"
+                  multiline
+                />
+                <Button title="Save" onPress={() => onSave(text)} />
+              </View>
             </ScrollView>
           </View>
         </Modal>
       );
   } else {
     // web: render lexical web editor in a modal-like container
-    if (WebEditor) {
+    const webAvailable = !!WebEditor;
+    if (webAvailable) {
       return (
-        <Modal animationType="slide" transparent={true} visible={true}>
+        <Modal animationType="fade" transparent={true} visible={true}>
           <View style={styles.overlay}>
             <View style={[styles.modal, { maxHeight: '80%' }]}>
-              <WebEditor
-                initialText={note.content || ''}
-                onSave={(text) => {
-                  onSave(text);
-                }}
-              />
-              <Button title="Close" onPress={onClose} color="gray" />
+              <View style={styles.modalContent}>
+                <TouchableOpacity style={styles.closeButton} onPress={onClose} hitSlop={{top:10,left:10,right:10,bottom:10}}>
+                  <Text style={styles.closeText}>✕</Text>
+                </TouchableOpacity>
+                <WebEditor
+                  initialText={note?.content || ''}
+                  onSave={(text) => {
+                    onSave(text);
+                  }}
+                />
+              </View>
             </View>
           </View>
         </Modal>
@@ -55,18 +66,22 @@ export default function NoteEditorModal({ note, onClose, onSave }) {
     // fallback to a simple web textarea if lexical isn't available
   }
     return (
-      <Modal animationType="slide" transparent={true} visible={true}>
+      <Modal animationType="fade" transparent={true} visible={true}>
         <View style={styles.overlay}>
           <ScrollView style={styles.modal}>
-            <TextInput
-              style={styles.input}
-              value={text}
-              onChangeText={setText}
-              placeholder="Edit your note"
-              multiline
-            />
-            <Button title="Save" onPress={() => onSave(text)} />
-            <Button title="Cancel" onPress={onClose} color="gray" />
+            <View style={styles.modalContent}>
+              <TouchableOpacity style={styles.closeButton} onPress={onClose} hitSlop={{top:10,left:10,right:10,bottom:10}}>
+                <Text style={styles.closeText}>✕</Text>
+              </TouchableOpacity>
+              <TextInput
+                style={styles.input}
+                value={text}
+                onChangeText={setText}
+                placeholder="Edit your note"
+                multiline
+              />
+              <Button title="Save" onPress={() => onSave(text)} />
+            </View>
           </ScrollView>
         </View>
       </Modal>
@@ -87,6 +102,26 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     elevation: 5,
+  },
+  modalContent: {
+    position: 'relative',
+    minHeight: 200,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  zIndex: 9999,
+  elevation: 9999,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  padding: 8,
+  borderRadius: 16,
+  alignItems: 'center',
+  justifyContent: 'center',
+  },
+  closeText: {
+  fontSize: 20,
+  color: '#fff',
   },
   input: {
     height: 100,

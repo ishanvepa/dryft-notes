@@ -38,6 +38,7 @@ export default function HomeScreen() {
   });
 
   useTestAuth();
+  const [editorOpen, setEditorOpen] = useState(false);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
@@ -73,7 +74,9 @@ export default function HomeScreen() {
         notes={notes}
         relationships={links}
         onUpdateNote={(newNotes) => setNotes(newNotes)}
+        onEditorOpenChange={(isOpen: boolean) => setEditorOpen(isOpen)}
       />
+      {!editorOpen && (
       <TouchableOpacity style={styles.fab} 
         onPress={ () => router.push("/new_note")
         //   () => {
@@ -100,7 +103,8 @@ export default function HomeScreen() {
       }
       >
         <Feather name="plus" size={24} color="#fff" />
-      </TouchableOpacity>
+  </TouchableOpacity>
+  )}
 
     </SafeAreaView>
   );
