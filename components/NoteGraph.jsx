@@ -102,7 +102,7 @@ const initialScale = useSharedValue(1);
   return (
     <GestureDetector gesture={composedGesture}>
       <View style={{ flex: 1 }}>
-        <Svg width={width} height={height} pointerEvents="none">
+  <Svg width={width} height={height}>
           <G transform={transformStr}>
             {links.map((l, i) => (
               <Line key={i} x1={l.source.x} y1={l.source.y} x2={l.target.x} y2={l.target.y} stroke="#aaa" strokeWidth="3" />
@@ -120,7 +120,7 @@ const initialScale = useSharedValue(1);
 
         {selectedNote && (
           <NoteEditorModal note={selectedNote} onClose={() => setSelectedNote(null)} onSave={handleSave} />
-        )}
+        )}  
       </View>
     </GestureDetector>
   );

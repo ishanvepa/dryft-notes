@@ -1,9 +1,15 @@
 import logging
 import os
 from pathlib import Path
+from urllib.parse import urlencode
 
+import requests
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+# Local modules
+from note import Note
+from notes_list import NoteList
 
 # Load environment files (project root .env then .env.local overriding)
 root = Path(__file__).resolve().parent.parent
@@ -18,7 +24,6 @@ if env_local.exists():
     print(f'Loaded environment from {env_local}')
 
 logger = logging.getLogger('backend')
-from flask_cors import CORS
 
 app = Flask(__name__)
 # Configure CORS:
@@ -320,4 +325,4 @@ def r_get_notes():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)    app.run(host="0.0.0.0", port=5000, debug=True)

@@ -5,7 +5,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
+import { $createParagraphNode, $createTextNode, $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
 import LexicalTheme from './LexicalTheme';
 
 import './LexicalTheme.css';
@@ -14,6 +14,27 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import handleSave from './saveNote';
+
+function InnerEditor({ initialText }: { initialText?: string }) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (initialText === undefined || initialText === null) return;
+    try {
+      editor.update(() => {
+        const root = $getRoot();
+        root.clear();
+        const paragraph = $createParagraphNode();
+        paragraph.append($createTextNode(initialText));
+        root.append(paragraph);
+      });
+    } catch (err) {
+      console.warn('Failed to set initial text in editor:', err);
+    }
+  }, [initialText, editor]);
+
+  return null;
+}
 
 function Toolbar() {
   const [editor] = useLexicalComposerContext();
@@ -163,27 +184,32 @@ function Toolbar() {
   );
 }
 
-function SaveButton({ router, style }: { router: any; style?: React.CSSProperties }) {
+function SaveButton({ router, style, onSave }: { router: any; style?: React.CSSProperties; onSave?: (text?: string) => void }) {
   const [editor] = useLexicalComposerContext();
 
   const onClick = async () => {
-    let json: any = null;
+    let plainText: string | undefined;
     try {
       editor.getEditorState().read(() => {
-        json = editor.getEditorState().toJSON();
+        const root = $getRoot();
+        plainText = root.getTextContent();
       });
     } catch (e) {
-      // fallback: try to call toJSON on editorState fetched synchronously
       try {
         const s = editor.getEditorState();
-        json = s.toJSON();
+        plainText = s.toJSON ? JSON.stringify(s.toJSON()) : undefined;
       } catch (err) {
         console.warn('Failed to read editor state for save:', err);
       }
     }
 
-  const text: string | undefined = json ? JSON.stringify(json) : undefined;
-  handleSave(router, { text });
+    if (onSave) {
+      onSave(plainText);
+      return;
+    }
+
+    // fallback: use shared handleSave which expects router and note
+    handleSave(router, { text: plainText });
   };
 
   return (
@@ -193,7 +219,7 @@ function SaveButton({ router, style }: { router: any; style?: React.CSSPropertie
   );
 }
 
-export default function WebRichTextEditor() {
+export default function WebRichTextEditor({ initialText, onSave }: { initialText?: string; onSave?: (text?: string) => void }) {
   const router = useRouter();
 
   // navigation + save handled by SaveButton which calls shared handleSave
@@ -266,7 +292,7 @@ export default function WebRichTextEditor() {
         />
         <HistoryPlugin />
         <AutoFocusPlugin />
-        <SaveButton router={router} style={styles.fab} />
+  <SaveButton router={router} style={styles.fab} onSave={onSave} />
       </LexicalComposer>
     </div>
   );
